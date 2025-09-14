@@ -263,6 +263,7 @@ st.markdown(
 
 # ...existing code...
 
+# ...existing code...
 # -----------------------------
 # 🏬 ยอดขายและจำนวนออเดอร์ของแต่ละสาขา (2 กราฟใน 1 แถว)
 # -----------------------------
@@ -273,21 +274,24 @@ store_perf = (
      .sort_values('net_sales', ascending=False)
 )
 
-colS1, colS2 = st.columns([1.1, 1])
+colS1, colS2 = st.columns([1, 1])
+
 with colS1:
-    fig_store_bar_sales = px.bar(
+    fig_store_pie = px.pie(
         store_perf,
-        x='store_name',
-        y='net_sales',
-        text='net_sales',
-        title="ยอดขายสุทธิต่อสาขา",
-        color='net_sales',
-        color_continuous_scale='viridis',
-        labels={'store_name': 'สาขา', 'net_sales': 'ยอดขายสุทธิ'}
+        names='store_name',
+        values='net_sales',
+        title='สัดส่วนยอดขายสุทธิแต่ละสาขา',
+        color='store_name',
+        color_discrete_sequence=px.colors.qualitative.Set3
     )
-    fig_store_bar_sales.update_traces(texttemplate='%{text:,.0f}', textposition='outside', cliponaxis=False)
-    fig_store_bar_sales.update_layout(template="plotly_white", xaxis_title="สาขา", yaxis_title="ยอดขายสุทธิ (฿)")
-    st.plotly_chart(fig_store_bar_sales, use_container_width=True, key="store_sales_bar")
+    fig_store_pie.update_traces(textinfo='percent+label', pull=[0.05]*len(store_perf), textfont_size=13)
+    fig_store_pie.update_layout(
+        template="plotly_white",
+        height=365,  # สูงเท่ากับ Bar ด้านขวา
+        margin=dict(t=50, b=20, l=20, r=20)
+    )
+    st.plotly_chart(fig_store_pie, use_container_width=True, key="store_sales_pie")
 
 with colS2:
     fig_store_bar_orders = px.bar(
@@ -301,11 +305,15 @@ with colS2:
         labels={'store_name': 'สาขา', 'orders': 'จำนวนออเดอร์'}
     )
     fig_store_bar_orders.update_traces(texttemplate='%{text:,}', textposition='outside', cliponaxis=False)
-    fig_store_bar_orders.update_layout(template="plotly_white", xaxis_title="สาขา", yaxis_title="จำนวนออเดอร์")
+    fig_store_bar_orders.update_layout(
+        template="plotly_white",
+        xaxis_title="สาขา",
+        yaxis_title="จำนวนออเดอร์",
+        height=380,
+        margin=dict(t=50, b=40, l=20, r=20),
+        showlegend=False
+    )
     st.plotly_chart(fig_store_bar_orders, use_container_width=True, key="store_orders_bar")
-
-
-# ...existing code for staff and shipping...
 # -----------------------------
 # 👤 ประสิทธิภาพพนักงานขาย (2 กราฟใน 1 แถว)
 # -----------------------------
@@ -318,29 +326,27 @@ staff_perf = (
      .head(10)
 )
 
-col3, col4 = st.columns([1.2, 1])
+col3, col4 = st.columns([1, 1])
+
+graph_height = 400  # กำหนดความสูงเท่ากันทั้งสองกราฟ
+margin_settings = dict(t=50, b=50, l=20, r=20)  # margin เท่ากัน
+
 with col3:
-    fig_staff_sales = px.bar(
+    fig_staff_pie = px.pie(
         staff_perf,
-        x='staff_fullname',
-        y='net_sales',
-        text='net_sales',
-        title="ยอดขายสุทธิของพนักงาน",
-        color='net_sales',
-        color_continuous_scale='plasma',
-        labels={'staff_fullname': 'ชื่อพนักงาน', 'net_sales': 'ยอดขายสุทธิ'}
+        names='staff_fullname',
+        values='net_sales',
+        title='สัดส่วนยอดขายสุทธิของพนักงาน',
+        color='staff_fullname',
+        color_discrete_sequence=px.colors.qualitative.Pastel
     )
-    fig_staff_sales.update_traces(texttemplate='%{text:,.0f}', textposition='outside', cliponaxis=False)
-    fig_staff_sales.update_layout(
+    fig_staff_pie.update_traces(textinfo='percent+label', pull=[0.05]*len(staff_perf), textfont_size=13)
+    fig_staff_pie.update_layout(
         template="plotly_white",
-        xaxis_tickangle=-20,
-        xaxis_title="ชื่อพนักงาน",
-        yaxis_title="ยอดขายสุทธิ (฿)",
-        height=320,
-        margin=dict(t=40, b=60, l=10, r=10),
-        showlegend=False
+        height=380,  # สูงเท่ากับ Bar ด้านขวา
+        margin=dict(t=50, b=20, l=20, r=20)
     )
-    st.plotly_chart(fig_staff_sales, use_container_width=True, key="staff_sales_bar")
+    st.plotly_chart(fig_staff_pie, use_container_width=True, key="staff_sales_pie")
 
 with col4:
     fig_staff_orders = px.bar(
@@ -359,13 +365,12 @@ with col4:
         xaxis_tickangle=-20,
         xaxis_title="ชื่อพนักงาน",
         yaxis_title="จำนวนออเดอร์",
-        height=320,
-        margin=dict(t=40, b=60, l=10, r=10),
+        height=graph_height,
+        margin=margin_settings,
         showlegend=False
     )
     st.plotly_chart(fig_staff_orders, use_container_width=True, key="staff_orders_bar")
 
-st.markdown("---")
 
 # -----------------------------
 # 🚚 ความตรงเวลาในการส่ง (Order-to-Ship) (2 คอลัมน์)

@@ -287,10 +287,13 @@ repeat_state['non_repeat_customers'] = repeat_state['customers'] - repeat_state[
 
 # เลือก Top 15 รัฐที่มีลูกค้ามากที่สุด
 df_bar = repeat_state.sort_values('customers', ascending=False).head(15)
+# -----------------------------
+# Layout ครึ่งซ้าย-ขวาเท่ากัน
+# -----------------------------
+left_col, right_col = st.columns([1, 1])  # ซ้ายขวา 50:50
 
-col1, col2, col3 = st.columns([1,1,1])
-
-with col1:
+# ---------- ฝั่งซ้าย ----------
+with left_col:
     st.markdown("#### จำนวนลูกค้าตามรัฐ (Treemap)")
     fig_treemap = px.treemap(
         ts,
@@ -301,55 +304,61 @@ with col1:
         labels={'customer_state': 'รัฐ', 'count': 'จำนวนลูกค้า'},
         title=''
     )
-    fig_treemap.update_layout(margin=dict(t=30, l=0, r=0, b=0))
+    fig_treemap.update_layout(margin=dict(t=30, l=0, r=0, b=0), height=700)
     st.plotly_chart(fig_treemap, use_container_width=True, key="treemap_state")
 
-with col2:
-    st.markdown("#### จำนวนลูกค้าซื้อซ้ำ vs ลูกค้าใหม่ (แต่ละรัฐ)")
-    fig_stacked = go.Figure()
-    fig_stacked.add_trace(go.Bar(
-        y=df_bar['customer_state'],
-        x=df_bar['repeat_customers'],
-        name='ลูกค้าซื้อซ้ำ',
-        orientation='h',
-        marker_color='#4f8bc9',
-        text=df_bar['repeat_customers'].map(lambda x: f"{int(x):,}")
-    ))
-    fig_stacked.add_trace(go.Bar(
-        y=df_bar['customer_state'],
-        x=df_bar['non_repeat_customers'],
-        name='ลูกค้าใหม่',
-        orientation='h',
-        marker_color='#e0e0e0',
-        text=df_bar['non_repeat_customers'].map(lambda x: f"{int(x):,}")
-    ))
-    fig_stacked.update_layout(
-        barmode='stack',
-        yaxis_title='รัฐ',
-        xaxis_title='จำนวนลูกค้า',
-        margin=dict(l=0, r=0, t=30, b=0),
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
-    )
-    st.plotly_chart(fig_stacked, use_container_width=True, key="stacked_repeat_state")
+# ---------- ฝั่งขว ----------
+with right_col:
+    # ใช้ container ซ้อนสองกราฟ
+    with st.container():
+        st.markdown("#### จำนวนลูกค้าซื้อซ้ำ vs ลูกค้าใหม่ (แต่ละรัฐ)")
+        fig_stacked = go.Figure()
+        fig_stacked.add_trace(go.Bar(
+            y=df_bar['customer_state'],
+            x=df_bar['repeat_customers'],
+            name='ลูกค้าซื้อซ้ำ',
+            orientation='h',
+            marker_color='#4f8bc9',
+            text=df_bar['repeat_customers'].map(lambda x: f"{int(x):,}")
+        ))
+        fig_stacked.add_trace(go.Bar(
+            y=df_bar['customer_state'],
+            x=df_bar['non_repeat_customers'],
+            name='ลูกค้าใหม่',
+            orientation='h',
+            marker_color='#e0e0e0',
+            text=df_bar['non_repeat_customers'].map(lambda x: f"{int(x):,}")
+        ))
+        fig_stacked.update_layout(
+            barmode='stack',
+            yaxis_title='รัฐ',
+            xaxis_title='จำนวนลูกค้า',
+            margin=dict(l=0, r=0, t=30, b=0),
+            height=340,  # ครึ่งบนของคอลัมน์ขวา
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1)
+        )
+        st.plotly_chart(fig_stacked, use_container_width=True, key="stacked_repeat_state")
 
-with col3:
-    st.markdown("#### อัตราลูกค้าซื้อซ้ำตามรัฐ")
-    df_repeat_state = repeat_state[repeat_state['customers'] >= 2].sort_values('repeat_rate', ascending=False).head(15)
-    fig_repeat_state = px.bar(
-        df_repeat_state,
-        x='repeat_rate',
-        y='customer_state',
-        orientation='h',
-        color='repeat_rate',
-        color_continuous_scale='Blues',
-        labels={'repeat_rate':'อัตราซื้อซ้ำ', 'customer_state':'รัฐ'},
-        text=df_repeat_state['repeat_rate'].map(lambda x: f"{x:.1%}")
-    )
-    fig_repeat_state.update_layout(
-        margin=dict(l=0, r=0, t=30, b=0)
-    )
-    fig_repeat_state.update_traces(textposition="outside", cliponaxis=False)
-    st.plotly_chart(fig_repeat_state, use_container_width=True, key="repeat_rate_state")
+    with st.container():
+        st.markdown("#### อัตราลูกค้าซื้อซ้ำตามรัฐ")
+        df_repeat_state = repeat_state[repeat_state['customers'] >= 2].sort_values('repeat_rate', ascending=False).head(15)
+        fig_repeat_state = px.bar(
+            df_repeat_state,
+            x='repeat_rate',
+            y='customer_state',
+            orientation='h',
+            color='repeat_rate',
+            color_continuous_scale='Blues',
+            labels={'repeat_rate':'อัตราซื้อซ้ำ', 'customer_state':'รัฐ'},
+            text=df_repeat_state['repeat_rate'].map(lambda x: f"{x:.1%}")
+        )
+        fig_repeat_state.update_layout(
+            margin=dict(l=0, r=0, t=30, b=0),
+            height=340  # ครึ่งล่างของคอลัมน์ขวา
+        )
+        fig_repeat_state.update_traces(textposition="outside", cliponaxis=False)
+        st.plotly_chart(fig_repeat_state, use_container_width=True, key="repeat_rate_state")
+
 # -----------------------------
 # ตารางสรุป
 # -----------------------------
