@@ -372,40 +372,40 @@ with col4:
     st.plotly_chart(fig_staff_orders, use_container_width=True, key="staff_orders_bar")
 
 
-# -----------------------------
-# 🚚 ความตรงเวลาในการส่ง (Order-to-Ship) (2 คอลัมน์)
-# -----------------------------
-st.markdown("### 🚚 ความตรงเวลาในการจัดส่ง")
-f2 = f.copy()
-f2['shipped_date'] = pd.to_datetime(f2['shipped_date'])
-f2['order_to_ship_days'] = (f2['shipped_date'] - f2['order_date']).dt.days
-f2['on_time'] = f2['order_to_ship_days'] <= 0
-ship_perf = f2.groupby('store_name', as_index=False).agg(
-    avg_days=('order_to_ship_days','mean'),
-    on_time_rate=('on_time','mean')
-)
+# # -----------------------------
+# # 🚚 ความตรงเวลาในการส่ง (Order-to-Ship) (2 คอลัมน์)
+# # -----------------------------
+# st.markdown("### 🚚 ความตรงเวลาในการจัดส่ง")
+# f2 = f.copy()
+# f2['shipped_date'] = pd.to_datetime(f2['shipped_date'])
+# f2['order_to_ship_days'] = (f2['shipped_date'] - f2['order_date']).dt.days
+# f2['on_time'] = f2['order_to_ship_days'] <= 0
+# ship_perf = f2.groupby('store_name', as_index=False).agg(
+#     avg_days=('order_to_ship_days','mean'),
+#     on_time_rate=('on_time','mean')
+# )
 
-colT1, colT2 = st.columns([1, 1])
-with colT1:
-    st.markdown("#### ตารางสรุปการจัดส่ง")
-    st.dataframe(ship_perf, use_container_width=True, height=220)
-with colT2:
-    fig_ship = px.scatter(
-        ship_perf,
-        x='avg_days',
-        y='on_time_rate',
-        text='store_name',
-        trendline='ols',
-        title='เฉลี่ยวันจัดส่ง vs อัตราส่งตรงเวลา',
-        color='on_time_rate',
-        color_continuous_scale='RdYlBu'
-    )
-    fig_ship.update_traces(textposition='top center')
-    fig_ship.update_layout(
-        template="plotly_white",
-        xaxis_title='เฉลี่ยวันจัดส่ง (วัน)',
-        yaxis_title='อัตราส่งตรงเวลา',
-        height=220,
-        margin=dict(t=40, b=20, l=10, r=10)
-    )
-    st.plotly_chart(fig_ship, use_container_width=True, key="ship_perf_scatter")
+# colT1, colT2 = st.columns([1, 1])
+# with colT1:
+#     st.markdown("#### ตารางสรุปการจัดส่ง")
+#     st.dataframe(ship_perf, use_container_width=True, height=220)
+# with colT2:
+#     fig_ship = px.scatter(
+#         ship_perf,
+#         x='avg_days',
+#         y='on_time_rate',
+#         text='store_name',
+#         trendline='ols',
+#         title='เฉลี่ยวันจัดส่ง vs อัตราส่งตรงเวลา',
+#         color='on_time_rate',
+#         color_continuous_scale='RdYlBu'
+#     )
+#     fig_ship.update_traces(textposition='top center')
+#     fig_ship.update_layout(
+#         template="plotly_white",
+#         xaxis_title='เฉลี่ยวันจัดส่ง (วัน)',
+#         yaxis_title='อัตราส่งตรงเวลา',
+#         height=220,
+#         margin=dict(t=40, b=20, l=10, r=10)
+#     )
+#     st.plotly_chart(fig_ship, use_container_width=True, key="ship_perf_scatter")
