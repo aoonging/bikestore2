@@ -358,18 +358,3 @@ with right_col:
         )
         fig_repeat_state.update_traces(textposition="outside", cliponaxis=False)
         st.plotly_chart(fig_repeat_state, use_container_width=True, key="repeat_rate_state")
-
-# -----------------------------
-# ตารางสรุป
-# -----------------------------
-st.markdown("### ตารางสรุปจำนวนลูกค้าและอัตราซื้อซ้ำ")
-colT1, colT2 = st.columns(2)
-with colT1:
-    st.markdown("##### ตามรัฐ")
-    st.dataframe(repeat_state[['customer_state', 'customers', 'repeat_rate']].sort_values('repeat_rate', ascending=False), use_container_width=True)
-with colT2:
-    st.markdown("##### ตามเมือง")
-    st.dataframe(repeat_city[['customer_city', 'customers', 'repeat_rate']].sort_values('repeat_rate', ascending=False), use_container_width=True)
-    
-    # -----------------------------
-    
