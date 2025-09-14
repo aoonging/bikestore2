@@ -98,7 +98,7 @@ def growth_rate(series: pd.Series):
 st.sidebar.title("⚙️ ตัวกรองข้อมูล")
 
 
-DB_PATH = r"/Users/mac/Downloads/Web/data_cube/bikestore.duckdb"
+DB_PATH = "data_cube/bikestore.duckdb"
 
 
 (
