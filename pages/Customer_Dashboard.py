@@ -12,7 +12,7 @@ import duckdb as dd
 st.set_page_config(
     page_title="Customer Dashboard",
     layout="wide",
-    page_icon="🌞"
+    page_icon="🚲"
 )
 
 # Minimal CSS ปรับให้ดูโล่ง อ่านง่าย
@@ -188,21 +188,21 @@ st.markdown("""
         display: flex;
         gap: 18px;
         margin-bottom: 24px;
-        justify-content: space-between; /* เปลี่ยนจาก center เป็น space-between */
-        width: 100%; /* ให้เต็มหน้าจอ */
+        justify-content: space-between;
+        width: 100%;
     }
     .metric-card {
-        background: linear-gradient(135deg, #9dcaeb 0%, #f8d5f8 100%);
+        background: linear-gradient(135deg, #4f8bc9 0%, #b3d8fd 100%);
         border-radius: 18px;
         padding: 22px 18px 18px 18px;
-        box-shadow: 0 4px 20px rgba(240, 120, 180, 0.10);
+        box-shadow: 0 4px 20px rgba(79,139,201,0.10);
         text-align: center;
-        color: #990066;
-        border: 1px solid #f8bbd0;
+        color: #2d3748;
+        border: 1px solid #4f8bc9;
         min-width: 180px;
         max-width: 100%;
         min-height: 120px;
-        flex: 1; /* ให้แต่ละ card ขยายเท่า ๆ กัน */
+        flex: 1;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -214,12 +214,14 @@ st.markdown("""
         font-weight: bold;
         margin-bottom: 10px;
         letter-spacing: 0.5px;
+        color: #2d3748;
     }
     .metric-value {
         font-size: 2.1rem;
         font-weight: bold;
         margin-bottom: 0;
         letter-spacing: 0.5px;
+        color: #2d3748;
     }
     @media (max-width: 900px) {
         .kpi-row { flex-direction: column; align-items: stretch; }
@@ -247,6 +249,7 @@ st.markdown(
     """,
     unsafe_allow_html=True
 )
+
 # ...existing code...
 
 # -----------------------------

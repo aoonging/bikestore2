@@ -208,7 +208,7 @@ st.markdown("""
         padding: 18px 18px 12px 18px;
         box-shadow: 0 4px 20px rgba(240, 120, 180, 0.10);
         text-align: center;
-        color: #ad1457;
+        color: #222222;
         border: 1px solid #f8bbd0;
         min-width: 220px;
         max-width: 220px;
@@ -244,7 +244,7 @@ st.markdown("""
 
 
 # -----------------------------
-# 📊 KPI Cards (ปรับขนาดและสีให้ดูเป็น Dashboard)
+# 📊 KPI Cards (เปลี่ยนสีเป็นโทนฟ้า)
 # -----------------------------
 st.markdown("""
    <style>
@@ -256,13 +256,13 @@ st.markdown("""
        width: 100%;
    }
    .metric-card {
-       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+       background: linear-gradient(135deg, #4f8bc9 0%, #b3d8fd 100%);
        border-radius: 14px;
        padding: 18px 18px 12px 18px;
-       box-shadow: 0 4px 16px rgba(102,126,234,0.10);
+       box-shadow: 0 4px 16px rgba(79,139,201,0.10);
        text-align: center;
-       color: #fff;
-       border: 1px solid #667eea;
+       color: #2d3748;
+       border: 1px solid #4f8bc9;
        min-width: 160px;
        max-width: 100%;
        min-height: 100px;
@@ -291,7 +291,6 @@ st.markdown("""
    }
    </style>
 """, unsafe_allow_html=True)
-
 
 st.markdown(
    f"""
@@ -324,6 +323,8 @@ st.markdown("---")
 # -----------------------------
 # 📈 แนวโน้มยอดขาย & จำนวนออเดอร์ (2 กราฟใน 1 แถว)
 # -----------------------------
+
+# แนวโน้มยอดขาย & จำนวนออเดอร์ (2 กราฟใน 1 แถว)
 st.markdown("### แนวโน้มยอดขายและออเดอร์ตามช่วงเวลา")
 col1, col2 = st.columns([1,1])
 with col1:
@@ -331,7 +332,8 @@ with col1:
        trend_df, x=period, y='net_sales',
        markers=True,
        title=f"แนวโน้มยอดขาย ($) by {period}",
-       labels={period: "ช่วงเวลา", "net_sales": "ยอดขายสุทธิ ($)"}
+       labels={period: "ช่วงเวลา", "net_sales": "ยอดขายสุทธิ ($)"},
+       color_discrete_sequence=["#4f8bc9"]
    )
    fig_sales.update_layout(template="plotly_white", legend_title_text="ยอดขายสุทธิ", height=320, margin=dict(t=40, b=40, l=10, r=10))
    st.plotly_chart(fig_sales, use_container_width=True, key="sales_trend")
@@ -340,10 +342,12 @@ with col2:
        trend_df, x=period, y='orders',
        markers=True,
        title=f"แนวโน้มจำนวนออเดอร์ by {period}",
-       labels={period: "ช่วงเวลา", "orders": "จำนวนออเดอร์"}
+       labels={period: "ช่วงเวลา", "orders": "จำนวนออเดอร์"},
+       color_discrete_sequence=["#4f8bc9"]
    )
    fig_orders.update_layout(template="plotly_white", legend_title_text="จำนวนออเดอร์", height=320, margin=dict(t=40, b=40, l=10, r=10))
    st.plotly_chart(fig_orders, use_container_width=True, key="orders_trend")
+
 
 
 st.markdown("---")
@@ -373,6 +377,7 @@ prod_qty = (
 )
 
 
+# Top10 สินค้าขายดี (2 กราฟใน 1 แถว)
 st.markdown("### Top10 สินค้าขายดี")
 col3, col4 = st.columns([1,1])
 with col3:
@@ -384,7 +389,7 @@ with col3:
        title='Top 10 สินค้าขายดีตามรายได้',
        labels={'product_name': 'ชื่อสินค้า', 'net_sales': 'รายได้สุทธิ ($)'},
        color='net_sales',
-       color_continuous_scale='viridis'
+       color_continuous_scale='Blues'  # เปลี่ยนเป็นโทนฟ้า
    )
    fig_rev.update_traces(texttemplate='%{text:,.0f}', textposition='outside', cliponaxis=False)
    fig_rev.update_layout(template="plotly_white", xaxis_tickangle=-35, yaxis_title='รายได้สุทธิ ($)', showlegend=False, height=320, margin=dict(t=40, b=60, l=10, r=10))
@@ -398,7 +403,7 @@ with col4:
        title='Top 10 สินค้าขายดีตามจำนวนชิ้น',
        labels={'product_name': 'ชื่อสินค้า', 'quantity': 'จำนวนชิ้น'},
        color='quantity',
-       color_continuous_scale='plasma'
+       color_continuous_scale='Blues'  # เปลี่ยนเป็นโทนฟ้า
    )
    fig_qty.update_traces(texttemplate='%{text}', textposition='outside', cliponaxis=False)
    fig_qty.update_layout(template="plotly_white", xaxis_tickangle=-35, yaxis_title='จำนวนชิ้น', showlegend=False, height=320, margin=dict(t=40, b=60, l=10, r=10))
@@ -419,6 +424,7 @@ brand_cat = (
 )
 
 
+# Treemap แบรนด์ × หมวดหมู่
 st.markdown("### สัดส่วนยอดขายตามแบรนด์และหมวดหมู่สินค้า")
 fig_tree = px.treemap(
    brand_cat,
@@ -426,7 +432,7 @@ fig_tree = px.treemap(
    values='net_sales',
    title="Treemap: แบรนด์ × หมวดหมู่",
    color='net_sales',
-   color_continuous_scale='RdYlBu'
+   color_continuous_scale='Blues'  # เปลี่ยนเป็นโทนฟ้า
 )
 fig_tree.update_layout(margin=dict(t=50,l=0,r=0,b=0), height=400)
 st.plotly_chart(fig_tree, use_container_width=True, key="brand_cat_treemap")
@@ -450,6 +456,7 @@ disc = f.groupby('discount_range').agg(
 ).reset_index()
 
 
+# ผลของส่วนลดต่อปริมาณ/รายได้ (2 กราฟใน 1 แถว)
 st.markdown("### ผลของส่วนลดต่อปริมาณ & รายได้")
 col5, col6 = st.columns([1,1])
 with col5:
@@ -461,7 +468,7 @@ with col5:
        title='ปริมาณที่ขายได้ตามช่วงส่วนลด',
        labels={'discount_range': 'ช่วงส่วนลด (%)', 'total_qty': 'ปริมาณที่ขายได้ (ชิ้น)'},
        color='total_qty',
-       color_continuous_scale='Blues'
+       color_continuous_scale='Blues'  # เปลี่ยนเป็นโทนฟ้า
    )
    fig_dq.update_traces(textposition='outside', cliponaxis=False)
    fig_dq.update_layout(template="plotly_white", xaxis_title="ช่วงส่วนลด (%)", yaxis_title="ปริมาณที่ขายได้ (ชิ้น)", height=320, margin=dict(t=40, b=40, l=10, r=10))
@@ -475,9 +482,8 @@ with col6:
        title='รายได้ที่ขายได้ตามช่วงส่วนลด',
        labels={'discount_range': 'ช่วงส่วนลด (%)', 'total_sales': 'รายได้ที่ขายได้ ($)'},
        color='total_sales',
-       color_continuous_scale='RdYlBu'
+       color_continuous_scale='Blues'  # เปลี่ยนเป็นโทนฟ้า
    )
    fig_ds.update_traces(texttemplate='%{text:,.0f}', textposition='outside', cliponaxis=False)
    fig_ds.update_layout(template="plotly_white", xaxis_title="ช่วงส่วนลด (%)", yaxis_title="รายได้ที่ขายได้ ($)", height=320, margin=dict(t=40, b=40, l=10, r=10))
    st.plotly_chart(fig_ds, use_container_width=True, key="discount_sales")
-
