@@ -198,12 +198,12 @@ st.markdown("""
         width: 100%;
     }
     .metric-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #4f8bc9 0%, #b3d8fd 100%);
         border-radius: 14px;
         padding: 18px 18px 12px 18px;
         box-shadow: 0 4px 16px rgba(102,126,234,0.10);
         text-align: center;
-        color: #fff;
+        color: #2d3748;
         border: 1px solid #667eea;
         min-width: 160px;
         max-width: 100%;
@@ -263,7 +263,8 @@ st.markdown(
 
 # ...existing code...
 
-# ...existing code...
+# ...existing KPI card rendering code...
+
 # -----------------------------
 # 🏬 ยอดขายและจำนวนออเดอร์ของแต่ละสาขา (2 กราฟใน 1 แถว)
 # -----------------------------
@@ -275,20 +276,21 @@ store_perf = (
 )
 
 colS1, colS2 = st.columns([1, 1])
-
 with colS1:
+    # ใช้โทนสีฟ้าทั้งหมดสำหรับ Pie Chart สาขา
+    blue_palette = ["#174a7c", "#4f8bc9", "#90caf9", "#b3d8fd", "#e3f2fd", "#e0f7fa", "#b2ebf2", "#81d4fa", "#0288d1", "#01579b"]
     fig_store_pie = px.pie(
         store_perf,
         names='store_name',
         values='net_sales',
         title='สัดส่วนยอดขายสุทธิแต่ละสาขา',
         color='store_name',
-        color_discrete_sequence=px.colors.qualitative.Set3
+        color_discrete_sequence=blue_palette[:len(store_perf)]  # ใช้แต่สีฟ้า
     )
     fig_store_pie.update_traces(textinfo='percent+label', pull=[0.05]*len(store_perf), textfont_size=13)
     fig_store_pie.update_layout(
         template="plotly_white",
-        height=365,  # สูงเท่ากับ Bar ด้านขวา
+        height=365,
         margin=dict(t=50, b=20, l=20, r=20)
     )
     st.plotly_chart(fig_store_pie, use_container_width=True, key="store_sales_pie")
@@ -301,7 +303,7 @@ with colS2:
         text='orders',
         title="จำนวนออเดอร์ต่อสาขา",
         color='orders',
-        color_continuous_scale='Blues',
+        color_continuous_scale='Blues',  # สีฟ้า
         labels={'store_name': 'สาขา', 'orders': 'จำนวนออเดอร์'}
     )
     fig_store_bar_orders.update_traces(texttemplate='%{text:,}', textposition='outside', cliponaxis=False)
@@ -314,6 +316,7 @@ with colS2:
         showlegend=False
     )
     st.plotly_chart(fig_store_bar_orders, use_container_width=True, key="store_orders_bar")
+
 # -----------------------------
 # 👤 ประสิทธิภาพพนักงานขาย (2 กราฟใน 1 แถว)
 # -----------------------------
@@ -328,22 +331,24 @@ staff_perf = (
 
 col3, col4 = st.columns([1, 1])
 
-graph_height = 400  # กำหนดความสูงเท่ากันทั้งสองกราฟ
-margin_settings = dict(t=50, b=50, l=20, r=20)  # margin เท่ากัน
+graph_height = 400
+margin_settings = dict(t=50, b=50, l=20, r=20)
 
 with col3:
+    # ใช้โทนสีฟ้าทั้งหมดสำหรับ Pie Chart พนักงาน
+    blue_palette_staff = ["#174a7c", "#4f8bc9", "#90caf9", "#b3d8fd", "#e3f2fd", "#e0f7fa", "#b2ebf2", "#81d4fa", "#0288d1", "#01579b"]
     fig_staff_pie = px.pie(
         staff_perf,
         names='staff_fullname',
         values='net_sales',
         title='สัดส่วนยอดขายสุทธิของพนักงาน',
         color='staff_fullname',
-        color_discrete_sequence=px.colors.qualitative.Pastel
+        color_discrete_sequence=blue_palette_staff[:len(staff_perf)]  # ใช้แต่สีฟ้า
     )
     fig_staff_pie.update_traces(textinfo='percent+label', pull=[0.05]*len(staff_perf), textfont_size=13)
     fig_staff_pie.update_layout(
         template="plotly_white",
-        height=380,  # สูงเท่ากับ Bar ด้านขวา
+        height=380,
         margin=dict(t=50, b=20, l=20, r=20)
     )
     st.plotly_chart(fig_staff_pie, use_container_width=True, key="staff_sales_pie")
@@ -356,7 +361,7 @@ with col4:
         text='orders',
         title="จำนวนออเดอร์ของพนักงาน",
         color='orders',
-        color_continuous_scale='viridis',
+        color_continuous_scale='Blues',  # สีฟ้า
         labels={'staff_fullname': 'ชื่อพนักงาน', 'orders': 'จำนวนออเดอร์'}
     )
     fig_staff_orders.update_traces(texttemplate='%{text:,}', textposition='outside', cliponaxis=False)
@@ -370,42 +375,3 @@ with col4:
         showlegend=False
     )
     st.plotly_chart(fig_staff_orders, use_container_width=True, key="staff_orders_bar")
-
-
-# # -----------------------------
-# # 🚚 ความตรงเวลาในการส่ง (Order-to-Ship) (2 คอลัมน์)
-# # -----------------------------
-# st.markdown("### 🚚 ความตรงเวลาในการจัดส่ง")
-# f2 = f.copy()
-# f2['shipped_date'] = pd.to_datetime(f2['shipped_date'])
-# f2['order_to_ship_days'] = (f2['shipped_date'] - f2['order_date']).dt.days
-# f2['on_time'] = f2['order_to_ship_days'] <= 0
-# ship_perf = f2.groupby('store_name', as_index=False).agg(
-#     avg_days=('order_to_ship_days','mean'),
-#     on_time_rate=('on_time','mean')
-# )
-
-# colT1, colT2 = st.columns([1, 1])
-# with colT1:
-#     st.markdown("#### ตารางสรุปการจัดส่ง")
-#     st.dataframe(ship_perf, use_container_width=True, height=220)
-# with colT2:
-#     fig_ship = px.scatter(
-#         ship_perf,
-#         x='avg_days',
-#         y='on_time_rate',
-#         text='store_name',
-#         trendline='ols',
-#         title='เฉลี่ยวันจัดส่ง vs อัตราส่งตรงเวลา',
-#         color='on_time_rate',
-#         color_continuous_scale='RdYlBu'
-#     )
-#     fig_ship.update_traces(textposition='top center')
-#     fig_ship.update_layout(
-#         template="plotly_white",
-#         xaxis_title='เฉลี่ยวันจัดส่ง (วัน)',
-#         yaxis_title='อัตราส่งตรงเวลา',
-#         height=220,
-#         margin=dict(t=40, b=20, l=10, r=10)
-#     )
-#     st.plotly_chart(fig_ship, use_container_width=True, key="ship_perf_scatter")
