@@ -133,13 +133,6 @@ max_date = pd.to_datetime(sales['order_date']).max()
 # ---- Controls ----
 period = st.sidebar.selectbox("หน่วยเวลา (สำหรับกราฟแนวโน้ม)", ["month","quarter","year"], index=0)
 
-f_date = st.sidebar.date_input(
-    "ช่วงวันสั่งซื้อ",
-    value=(min_date.date(), max_date.date()),
-    min_value=min_date.date(),
-    max_value=max_date.date()
-)
-
 col_a, col_b = st.sidebar.columns(2)
 with col_a:
     f_store = st.multiselect("สาขา", options=sorted(stores['store_name'].unique()))
@@ -148,8 +141,14 @@ with col_b:
 
 f_category = st.sidebar.multiselect("หมวดหมู่สินค้า", options=sorted(categories['category_name'].unique()))
 
-if st.sidebar.button("รีเซ็ตตัวกรอง"):
-    st.experimental_rerun()
+f_date = st.sidebar.date_input(
+    "ช่วงวันสั่งซื้อ",
+    value=(min_date.date(), max_date.date()),
+    min_value=min_date.date(),
+    max_value=max_date.date()
+)
+# if st.sidebar.button("รีเซ็ตตัวกรอง"):
+#     st.experimental_rerun()
 
 # Apply Filters
 mask = (

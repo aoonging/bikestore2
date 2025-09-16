@@ -92,21 +92,21 @@ def growth_rate(series: pd.Series):
         return np.nan
     return (curr - prev) / prev
 
+# ...existing code...
+
 # -----------------------------
 # 🎛️ Sidebar – ฟิลเตอร์
 # -----------------------------
 st.sidebar.title("⚙️ ตัวกรองข้อมูล")
 
-
 DB_PATH = "data_cube/bikestore.duckdb"
-
 
 (
     dim_customers, dim_date, dim_staffs, dim_products,
     dim_brands, dim_categories, dim_stores, fact_sales
 ) = load_tables(DB_PATH)
 
-# ทำงานด้วย pandas ทั้งหมดเพื่อความสม่ำเสมอ
+# เตรียมข้อมูลหลัก
 customers = dim_customers.copy()
 products  = dim_products.copy()
 brands    = dim_brands.copy()
@@ -115,11 +115,9 @@ stores    = dim_stores.copy()
 staffs    = dim_staffs.copy()
 sales     = fact_sales.copy()
 
-# เตรียมข้อมูลหลัก
 sales = compute_net_sales(sales)
 sales = add_period_cols(sales)
 
-# Join dims ที่จำเป็น
 products_lite = products[['product_id','product_name','category_id','brand_id']]
 sales = sales.merge(products_lite, on='product_id', how='left')
 sales = sales.merge(categories[['category_id','category_name']], on='category_id', how='left')
@@ -127,30 +125,52 @@ sales = sales.merge(brands[['brand_id','brand_name']], on='brand_id', how='left'
 sales = sales.merge(stores[['store_id','store_name']], on='store_id', how='left')
 sales = sales.merge(customers[['customer_id','customer_city','customer_state']], on='customer_id', how='left')
 
-# วันที่ min-max สำหรับฟิลเตอร์
 min_date = pd.to_datetime(sales['order_date']).min()
 max_date = pd.to_datetime(sales['order_date']).max()
 
 # ---- Controls ----
-period = st.sidebar.selectbox("หน่วยเวลา (สำหรับกราฟแนวโน้ม)", ["month","quarter","year"], index=0)
+# ...existing code...
+
+# ---- Controls ----
+period = st.sidebar.selectbox(
+    "หน่วยเวลา (สำหรับกราฟแนวโน้ม)",
+    ["month","quarter","year"],
+    index=0,
+    key="period_filter"
+)
+
+col_a, col_b = st.sidebar.columns(2)
+with col_a:
+    f_store = st.multiselect(
+        "สาขา",
+        options=sorted(stores['store_name'].unique()),
+        key="store_filter"
+    )
+with col_b:
+    f_brand = st.multiselect(
+        "แบรนด์",
+        options=sorted(brands['brand_name'].unique()),
+        key="brand_filter"
+    )
+
+f_category = st.sidebar.multiselect(
+    "หมวดหมู่สินค้า",
+    options=sorted(categories['category_name'].unique()),
+    key="category_filter"
+)
 
 f_date = st.sidebar.date_input(
     "ช่วงวันสั่งซื้อ",
     value=(min_date.date(), max_date.date()),
     min_value=min_date.date(),
-    max_value=max_date.date()
+    max_value=max_date.date(),
+    key="date_filter"
 )
 
-col_a, col_b = st.sidebar.columns(2)
-with col_a:
-    f_store = st.multiselect("สาขา", options=sorted(stores['store_name'].unique()))
-with col_b:
-    f_brand = st.multiselect("แบรนด์", options=sorted(brands['brand_name'].unique()))
+# if st.sidebar.button("รีเซ็ตตัวกรอง"):
+#     st.rerun()
 
-f_category = st.sidebar.multiselect("หมวดหมู่สินค้า", options=sorted(categories['category_name'].unique()))
-
-if st.sidebar.button("รีเซ็ตตัวกรอง"):
-    st.experimental_rerun()
+# ...existing code...
 
 # Apply Filters
 mask = (
@@ -165,6 +185,8 @@ if f_category:
     mask &= sales['category_name'].isin(f_category)
 
 f = sales.loc[mask].copy()
+
+# ...existing code...
 # ...existing code...
 # ...existing code...
 
